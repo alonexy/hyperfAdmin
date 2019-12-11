@@ -22,7 +22,6 @@
     @show
 </head>
 <body>
-@datetime("1111")
 <!-- Wrapper-->
 <div id="wrapper">
 

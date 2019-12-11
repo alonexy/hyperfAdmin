@@ -9,14 +9,12 @@
     <div class="wrapper wrapper-content">
         <div class="ibox-content">
             <form method="POST" action="#" class="form-horizontal" id="createRole"  role="form" accept-charset="utf-8">
-                {!! csrf_field() !!}
-
                 <div class="form-group">
                     <label class="col-sm-2 control-label">角色名称*</label>
 
                     <div class="col-sm-10">
                         <input required="required" type="text" class="form-control required" name="name" autocomplete="off"
-                               placeholder="角色名称" maxlength="80" aria-required="true" value="{{$roleInfo->name or ''}}">
+                               placeholder="角色名称" maxlength="80" aria-required="true" value="{{$roleInfo->name ?? ''}}">
                     </div>
                 </div>
                 <div class="hr-line-dashed"></div>
@@ -35,11 +33,11 @@
                     <div class="col-sm-10">
                         <select class="js-example-placeholder-single form-control" id="status">
                             @if(!empty($roleInfo->status) && ($roleInfo->status == 1))
-                                <option value="{{$roleInfo->status or 1}}" selected>启用</option>
+                                <option value="{{$roleInfo->status ?? ''}}" selected>启用</option>
                                 <option value="2">关闭</option>
                             @else
                                 <option value="1">启用</option>
-                                <option value="{{$roleInfo->status or 2}}" selected>关闭</option>
+                                <option value="{{$roleInfo->status ?? 2}}" selected>关闭</option>
                             @endif
                         </select>
                     </div>
@@ -48,12 +46,12 @@
                     <label class="col-sm-2 control-label">备注</label>
                     <div class="col-sm-10">
                         <textarea class="form-control message-input" name="content"
-                                  placeholder="输入角色简介">{!! $roleInfo->desc or '' !!}</textarea>
+                                  placeholder="输入角色简介">{!! $roleInfo->desc ?? '' !!}</textarea>
                     </div>
                 </div>
 
-                <input type="hidden" name="status" value="{{$roleInfo->status or ''}}">
-                <input type="hidden" name="power" value="{{$roleInfo->powers or ''}}">
+                <input type="hidden" name="status" value="{{$roleInfo->status ?? ''}}">
+                <input type="hidden" name="power" value="{{$roleInfo->powers ?? ''}}">
                 @if(empty($roleInfo->id))
                     <button type="button" class="btn btn-primary" id="fsubmit">创建</button>
                 @else

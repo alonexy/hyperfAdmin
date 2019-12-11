@@ -17,7 +17,7 @@ use Hyperf\View\RenderInterface;
 
 /**
  * @AutoController(server="http")
- * @HfAdminC(Cname="用户中心",Cstyle="fa-user",Csort=2)
+ * @HfAdminC(Cname="客户管理",Cstyle="fa-user",Csort=20)
  * @Middleware(HfAdminMiddleWare::class)
  * Class HomeController
  * @package App\Controller\Admin

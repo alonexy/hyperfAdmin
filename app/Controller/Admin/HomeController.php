@@ -35,7 +35,6 @@ class HomeController extends AbstractController
     public function index(RequestInterface $request, RenderInterface $render)
     {
         $_private_info = $request->getAttribute('_private_info');
-
         return $render->render('inx.home.index', compact('_private_info'));
     }
     /**

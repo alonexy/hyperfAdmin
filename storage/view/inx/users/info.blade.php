@@ -4,7 +4,7 @@
 @stop
 @section('content')
 <div class="wrapper wrapper-content">
-    @if (count($errors) > 0)
+    @if (!empty($errors))
         <div class="alert alert-error">
             <ul>
                 @foreach ($errors->all() as $error)
@@ -24,32 +24,19 @@
                 <a class="collapse-link">
                     <i class="fa fa-chevron-up"></i>
                 </a>
-                {{--<a class="dropdown-toggle" data-toggle="dropdown" href="#">--}}
-                    {{--<i class="fa fa-wrench"></i>--}}
-                {{--</a>--}}
-                {{--<ul class="dropdown-menu dropdown-user">--}}
-                    {{--<li><a href="#">选项 1</a>--}}
-                    {{--</li>--}}
-                    {{--<li><a href="#">选项 2</a>--}}
-                    {{--</li>--}}
-                {{--</ul>--}}
-                {{--<a class="close-link">--}}
-                    {{--<i class="fa fa-times"></i>--}}
-                {{--</a>--}}
             </div>
         </div>
         <div class="ibox-content">
             <form method="POST" action="#" class="form-horizontal" role="form" id="form">
-                {!! csrf_field() !!}
                 <div class="form-group">
                     <label class="col-sm-2 control-label">账户名称</label>
                     <div class="col-sm-10">
                         @if(empty($Info->name))
                             <input required="required" type="text" class="form-control" name="name" autocomplete="off"
-                                   placeholder="名称" maxlength="80" value="{{old('name')}}">
+                                   placeholder="名称" maxlength="80" value="">
                         @else
                             <input required="required" type="text" class="form-control" name="name" autocomplete="off"
-                                   placeholder="名称" maxlength="80" value="{{$Info->name or ''}}">
+                                   placeholder="名称" maxlength="80" value="{{$Info->name ?? ''}}">
                         @endif
                     </div>
                 </div>
@@ -58,10 +45,10 @@
                     <div class="col-sm-10">
                         @if(empty($Info->email))
                             <input required  type="email" aria-required="true" aria-invalid="true" class="form-control" name="email" autocomplete="off"
-                                   placeholder="登陆邮箱" maxlength="80" value="{{old('email')}}">
+                                   placeholder="登陆邮箱" maxlength="80" value="">
                         @else
                             <input required="required" type="text" class="form-control" name="email" autocomplete="off"
-                                   placeholder="登陆邮箱" maxlength="80" value="{{$Info->email or ''}}">
+                                   placeholder="登陆邮箱" maxlength="80" value="{{$Info->email ?? ''}}">
                         @endif
                     </div>
                 </div>
@@ -90,7 +77,7 @@
                                 <option value="0">==请先去添加角色==</option>
                             @else
                                 @foreach($roles as $rv)
-                                    <option value="{{$rv->id or 0}}" @if(!empty($Info->rid) && $Info->rid == $rv->id) {{'selected'}} @endif >{{$rv->name or '--'}}</option>
+                                    <option value="{{$rv->id ?? 0}}" @if(!empty($Info->rid) && $Info->rid == $rv->id) {{'selected'}} @endif >{{$rv->name ?? '--'}}</option>
                                 @endforeach
                             @endif
                         </select>
@@ -101,11 +88,11 @@
                     <div class="col-sm-10">
                         <select class="form-control m-b" name="status">
                             @if(!empty($Info->status) && ($Info->status == 1))
-                                <option value="{{$Info->status or 1}}" selected>启用</option>
+                                <option value="{{$Info->status ?? 1}}" selected>启用</option>
                                 <option value="2">关闭</option>
                             @else
                                 <option value="1">启用</option>
-                                <option value="{{$Info->status or 2}}" selected>关闭</option>
+                                <option value="{{$Info->status ?? 2}}" selected>关闭</option>
                             @endif
                         </select>
                     </div>

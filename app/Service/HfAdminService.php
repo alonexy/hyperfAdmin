@@ -306,8 +306,14 @@ class HfAdminService
         return $this->session->has('user');
     }
 
-    public function errorView($code,$errMsg)
+    /**
+     * 错误页面渲染
+     * @param $code
+     * @param $errMsg
+     * @return mixed
+     */
+    public function errorView($code,$errMsg,$jump=null)
     {
-        return $this->view->render("errors.{$code}",compact("errMsg"));
+        return $this->view->render("errors.{$code}",compact("errMsg","jump"));
     }
 }

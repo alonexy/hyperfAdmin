@@ -11,18 +11,6 @@
                 <a class="collapse-link">
                     <i class="fa fa-chevron-up"></i>
                 </a>
-                {{--<a class="dropdown-toggle" data-toggle="dropdown" href="#">--}}
-                    {{--<i class="fa fa-wrench"></i>--}}
-                {{--</a>--}}
-                {{--<ul class="dropdown-menu dropdown-user">--}}
-                    {{--<li><a href="#">选项 1</a>--}}
-                    {{--</li>--}}
-                    {{--<li><a href="#">选项 2</a>--}}
-                    {{--</li>--}}
-                {{--</ul>--}}
-                {{--<a class="close-link">--}}
-                    {{--<i class="fa fa-times"></i>--}}
-                {{--</a>--}}
             </div>
         </div>
         <div class="ibox-content">
@@ -41,23 +29,23 @@
                 <tbody>
                 @foreach($list as $val)
                     <tr>
-                        <td class="text-muted">{{$val->name or ''}}</td>
-                        <td class="text-muted">{!!$val->email or ''!!}</td>
-                        <td class="text-muted">{{$val->r_name or ''}}</td>
+                        <td class="text-muted">{{$val->name ?? ''}}</td>
+                        <td class="text-muted">{!!$val->email ?? ''!!}</td>
+                        <td class="text-muted">{{$val->r_name ?? ''}}</td>
                         @if($val->status == 1)
                             <td class="text-muted">启用</td>
                         @else
                             <td class="text-muted">关闭</td>
                         @endif
 
-                        <td class="text-navy">{{$val->created_at or ''}}</td>
-                        <td class="text-navy">{{$val->updated_at or ''}}</td>
+                        <td class="text-navy">{{$val->created_at ?? ''}}</td>
+                        <td class="text-navy">{{$val->updated_at ?? ''}}</td>
                         <td>
-                            <a style="font-size: 16px" href="{{URL::route("admin::user::edit")}}?id={{$val->id or 0}}">
+                            <a style="font-size: 16px" href="/admin/user/edit?id={{$val->id ?? 0}}">
                                 <button class="btn btn-primary dim btn-sm" type="button"><i class="fa fa-fw fa-pencil" title="修改"></i></button>
                             </a>
                             <a style="font-size: 16px" href="javascript:void(0);">
-                                <button class="btn btn-warning dim btn-sm del_uer" type="button" dev_val="{{$val->id or 0}}"><i class="fa fa-fw fa-trash-o"  title="删除"></i></button>
+                                <button class="btn btn-warning dim btn-sm del_uer" type="button" dev_val="{{$val->id ?? 0}}"><i class="fa fa-fw fa-trash-o"  title="删除"></i></button>
                             </a>
                         </td>
                     </tr>
@@ -91,13 +79,13 @@
                                     var index = layer.load(2, {time: 10*1000});
                                     $.ajax({
                                         type : "POST",  //提交方式
-                                        url : "{{URL::route('admin::user::destroy')}}",//路径
+                                        url : "/admin/user/del",//路径
                                         data : {
                                             'id':id
                                         },
                                         dataType: "json",
                                         success : function(result) {
-                                            layer.close(index)
+                                            layer.close(index);
                                             if(result.status == 0){
                                                 swal('操作成功', result.msg, "success");
                                                 setTimeout(function(){

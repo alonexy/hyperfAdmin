@@ -54,7 +54,7 @@ class HfAdminMiddleWare implements MiddlewareInterface
 //        print_r($request->getAttributes());
         echo "\n";
         if (!$this->HfService->isLoign()) {
-            return $this->HfService->errorView(403, "请登陆！");
+            return $this->HfService->errorView(302, "请登陆！",'/auth/login');
         }
         list($res, $info) = $this->HfService->getAuthUser();
         if (!$res) {
