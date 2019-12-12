@@ -55,7 +55,7 @@ class HfAdminService
                 ->where('password',$this->passSign($passwd))
                 ->firstOrFail();
         }catch (ModelNotFoundException $e){
-            return [false,'not found',null];
+            return [false,'login Fail',null];
         }catch(\Exception $e){
             return [false,$e->getMessage(),null];
         }
@@ -271,6 +271,9 @@ class HfAdminService
         list($res,$action,$route) = $this->getCurrentActionAndRoute($request);
         if(!$res){
             throw new \Exception("1023 Err.");
+        }
+        if(!in_array($action,$Powers)){
+            throw new \Exception("没有权限.");
         }
         list($c,$f) = explode("@",$action);
         foreach($menus as &$menu){

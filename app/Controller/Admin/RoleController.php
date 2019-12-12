@@ -60,7 +60,7 @@ class RoleController extends AbstractController
      * @param RequestInterface $request
      * @param RenderInterface $view
      */
-    public function create(RequestInterface $request, RenderInterface $view)
+    public function create(RequestInterface $request, RenderInterface $view,ResponseInterface $response)
     {
         /** @var Role $role */
         $role = new Role();
@@ -76,7 +76,7 @@ class RoleController extends AbstractController
                 $addData['powers'] = $request->input('power');
                 $role->fill($addData);
                 $role->save();
-                return $this->index($request, $view);
+                return $response->redirect('/admin/role/index',302);
             }
             catch (\Exception $e) {
                 return $this->HfAdminService->errorView(403, "{$e->getMessage()}");
@@ -110,7 +110,7 @@ class RoleController extends AbstractController
      * @param RequestInterface $request
      * @param RenderInterface $view
      */
-    public function edit(RequestInterface $request, RenderInterface $view)
+    public function edit(RequestInterface $request, RenderInterface $view,ResponseInterface $response)
     {
         $_private_info = $request->getAttribute('_private_info');
         $menus         = $_private_info['menus'];
@@ -130,7 +130,7 @@ class RoleController extends AbstractController
             $addData['powers'] = $request->input('power');
             $roleInfo->fill($addData);
             $roleInfo->save();
-            return $this->index($request, $view);
+            return $response->redirect('/admin/role/index',302);
         }
         $menusJson = $this->menusHandle($menus, $roleInfo->powers);
         return $view->render('inx.roles.info', compact('_private_info', 'menusJson', 'roleInfo'));

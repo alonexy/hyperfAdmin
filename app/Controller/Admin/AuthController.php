@@ -43,13 +43,11 @@ class AuthController extends AbstractController
      * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function login(RequestInterface $request,RenderInterface $view)
+    public function login(RequestInterface $request,RenderInterface $view,ResponseInterface $response)
     {
         $errors = null;
-        $id = $this->session->get('user.info.id');
-        $status = 0;
-        if(!empty($id)){
-            $status = 1;
+        if($this->HfAdminService->isLoign()){
+            return $response->redirect('/admin/index',302);
         }
         if($request->getMethod() == 'POST'){
             $validator = $this->validationFactory->make(
@@ -73,15 +71,15 @@ class AuthController extends AbstractController
                     $errors = $validator->errors();
                 }
                 if($info['status'] !== 1){
-                    $status = 2; //用户状态异常
                     $validator->errors()->add('err',"用户状态异常");
                     $errors = $validator->errors();
+                }else{
+                    $this->session->set('user.info',$info);
+                    return $response->redirect('/admin/index',302);
                 }
-                $this->session->set('user.info',$info);
-                $status = 1;
             }
         }
-        return $view->render("auth.login",compact('errors','status'));
+        return $view->render("auth.login",compact('errors'));
     }
 
     /**

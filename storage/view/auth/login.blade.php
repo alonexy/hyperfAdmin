@@ -54,9 +54,6 @@
 <script src="/layer/layer.js"></script>
 <script type="text/javascript">
     $(function(){
-        @if ($status == 1)
-              window.location.href="/admin";
-        @endif
             $(".showpassword").each(function(index,input) {
             var $input = $(input);
             $("<p class='opt'/>").append(

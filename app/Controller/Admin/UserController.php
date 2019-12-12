@@ -76,7 +76,7 @@ class UserController extends AbstractController
      * @param RequestInterface $request
      * @param RenderInterface $view
      */
-    public function create(RequestInterface $request, RenderInterface $view)
+    public function create(RequestInterface $request, RenderInterface $view, ResponseInterface $response)
     {
         $_private_info = $request->getAttribute('_private_info');
         $errors        = null;
@@ -115,9 +115,7 @@ class UserController extends AbstractController
                         'status' => $request->input('status'),
                     ]);
                 if ($res) {
-                    //TODO tips:两者皆可
-//                    return $this->HfAdminService->errorView(302, "创建成功", "/admin/user/index");
-                    return $this->index($request, $view);
+                    return $response->redirect('/admin/user/index', 302);
                 }
             }
         }
@@ -130,12 +128,12 @@ class UserController extends AbstractController
      * @param RequestInterface $request
      * @param RenderInterface $view
      */
-    public function edit(RequestInterface $request, RenderInterface $view)
+    public function edit(RequestInterface $request, RenderInterface $view, ResponseInterface $response)
     {
         $_private_info = $request->getAttribute('_private_info');
         $errors        = null;
         $userid        = $request->input('id', 0);
-        if($userid == 1){
+        if ($userid == 1) {
             return $this->HfAdminService->errorView(403, "对不起，请求参数错误！");
         }
         if (empty($userid)) {
@@ -170,7 +168,8 @@ class UserController extends AbstractController
             ], $messages);
             if ($validator->fails()) {
                 $errors = $validator->errors();
-            }else{
+            }
+            else {
                 if (empty($request->input('roleid')) || $request->input('roleid') == 0) {
                     return $this->HfAdminService->errorView(403, "对不起，角色不能为空！");
                 }
@@ -181,7 +180,7 @@ class UserController extends AbstractController
                 $Info->status   = $request->input('status');
                 $res            = $Info->save();
                 if ($res) {
-                    return $this->index($request, $view);
+                    return $response->redirect('/admin/user/index', 302);
                 }
             }
         }
