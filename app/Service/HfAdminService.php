@@ -272,7 +272,7 @@ class HfAdminService
         if(!$res){
             throw new \Exception("1023 Err.");
         }
-        if(!in_array($action,$Powers)){
+        if(!in_array($action,$Powers) && $RoleType !== 1){
             throw new \Exception("没有权限.");
         }
         list($c,$f) = explode("@",$action);
