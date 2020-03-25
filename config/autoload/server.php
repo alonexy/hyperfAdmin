@@ -19,7 +19,7 @@ return [
         [
             'name' => 'http',
             'type' => Server::SERVER_HTTP,
-            'host' => '0.0.0.0',
+            'host' => "127.0.0.1",
             'port' => 9501,
             'sock_type' => SWOOLE_SOCK_TCP,
             'callbacks' => [

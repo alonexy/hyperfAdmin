@@ -8,6 +8,7 @@ runtime/
 vendor/
 .phpintel/
 .env
+.env.pro
 .DS_Store
 *.lock
 .phpunit
