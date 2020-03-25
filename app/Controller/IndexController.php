@@ -76,7 +76,12 @@ class IndexController extends AbstractController
         if (empty($uri)) {
             throw new JsonException("uri err.", 10001);
         }
-        $uri = urlencode($uri);
+        //TODO
+        if(preg_match('/[\x{4e00}-\x{9fff}]/iu',$uri)){
+            $uri = preg_replace_callback('/[\x{4e00}-\x{9fff}]/iu',function($d){
+                return urlencode($d[0]);
+            },$uri);
+        }
         //RFC 兼容 URL
         if (!filter_var($uri, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
             throw new JsonException("uri err.", 10002);
@@ -113,7 +118,7 @@ class IndexController extends AbstractController
             throw new JsonErrException("短ID查询失败[{$did}]",10003);
         }
         //TODO 统计
-        $juri = urlencode($juri);
+
         return $this->response->redirect($juri,302);
     }
 
