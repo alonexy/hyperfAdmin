@@ -50,7 +50,7 @@ class IndexController extends AbstractController
      */
     public function index(RequestInterface $request)
     {
-        $user      = $request->input('user', 'Hyperf');
+        $user      = $request->input('user', 'World!');
         $method    = $request->getMethod();
         $this->redis->set("hyper", "{$user}");
         return [
