@@ -14,8 +14,8 @@ return [
     'handler' => [
         'http' => [
             App\Exception\Handler\AppExceptionHandler::class,
-            App\Exception\Handler\JsonExceptionHandler::class,
-
+            App\Exception\Handler\JsonExceptionHandler::class, //不记录log
+            App\Exception\Handler\JsonErrExceptionHandler::class, //记录log
         ],
     ],
 ];

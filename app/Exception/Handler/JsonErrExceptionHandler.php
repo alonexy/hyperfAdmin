@@ -21,7 +21,7 @@ use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
-class JsonExceptionHandler extends ExceptionHandler
+class JsonErrExceptionHandler extends ExceptionHandler
 {
     /**
      * @var StdoutLoggerInterface

@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\AdminAnnotations\HfAdminC;
 use App\AdminAnnotations\HfAdminF;
 use App\Controller\AbstractController;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -15,6 +16,7 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use App\Middleware\HfAdminMiddleWare;
 use Hyperf\Utils\Context;
 use Hyperf\View\RenderInterface;
+use App\Service\QueueService;
 
 /**
  * @AutoController(prefix="/admin",server="http")
@@ -25,6 +27,11 @@ use Hyperf\View\RenderInterface;
  */
 class HomeController extends AbstractController
 {
+    /**
+     * @Inject()
+     * @var QueueService
+     */
+    protected $service;
     /**
      * @RequestMapping(methods="get,post")
      * @HfAdminF(Fname="首页",Fdisplay=true)
@@ -46,6 +53,9 @@ class HomeController extends AbstractController
      */
     public function todo_lists(RequestInterface $request, RenderInterface $render)
     {
-        return $render->render('test', ['name' => 'todo_lists']);
+        $time = time();
+        $res = $this->service->push([1,2,3,4,5,$time],10);
+        var_dump($res);
+        return $render->render('test', ['name' => 'todo_lists...']);
     }
 }
