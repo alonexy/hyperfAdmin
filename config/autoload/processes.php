@@ -12,5 +12,5 @@ declare(strict_types=1);
 
 return [
     Hyperf\AsyncQueue\Process\ConsumerProcess::class, //default
-    App\Process\AsyncQueueConsumer::class,//  test_asyn_job
+    App\Process\AsyncQueueConsumer::class,//  dwz_asyn_job
 ];

@@ -14,6 +14,7 @@ namespace App\Controller;
 
 use App\Exception\JsonErrException;
 use App\Exception\JsonException;
+use App\Service\xFunc;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Coroutine;
@@ -24,6 +25,10 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use App\Service\BinaryExtService;
+use App\Middleware\CorsMiddleware;
+use Hyperf\View\RenderInterface;
+use App\Service\DwzQueueService;
+use App\Service\DwzService;
 
 /**
  * @Controller(prefix="/",server="http")
@@ -31,68 +36,82 @@ use App\Service\BinaryExtService;
  */
 class IndexController extends AbstractController
 {
+    use xFunc;
     /**
      * @Inject()
      * @var BinaryExtService
      */
     public $s4Service;
+    /**
+     * @Inject()
+     * @var DwzQueueService
+     */
+    protected $dwzJobService;
+
+    /**
+     * @Inject()
+     * @var DwzService
+     */
+    protected $DwzService;
 
     protected $redis;
+
     public function __construct()
     {
-        $container = ApplicationContext::getContainer();
-        $this->redis     = $container->get(RedisFactory::class)->get('default');
+        $container   = ApplicationContext::getContainer();
+        $this->redis = $container->get(RedisFactory::class)->get('default');
     }
 
     /**
      * @RequestMapping(path="/",methods="get,post")
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function index(RequestInterface $request)
+    public function index(RequestInterface $request, RenderInterface $view)
     {
-        $user      = $request->input('user', 'World!');
-        $method    = $request->getMethod();
-        $this->redis->set("hyper", "{$user}");
-        return [
-            'cid' => Coroutine::id(),
-            'method' => $method,
-            'message' => "Hello {$user}.",
-        ];
+        $id_count     = $this->DwzService->GetNowId();
+        $access_num   = $this->DwzService->GetStatAccessNum();
+        $ip_count     = $this->DwzService->GetStatIp();
+        $ip_day_count = $this->DwzService->GetStatIp(date('Y-m-d'));
+
+        $id_count     = xFunc::convert($id_count);
+        $access_num   = xFunc::convert($access_num);
+        $ip_count     = xFunc::convert($ip_count);
+        $ip_day_count = xFunc::convert($ip_day_count);
+        return $view->render('web.index', compact('ip_count', 'ip_day_count', 'id_count', 'access_num'));
     }
 
     private function getS4Id()
     {
-        $incrId    = $this->redis->incr("dwz:_id", 1);
+        $incrId = $this->DwzService->GetIncrId();
         return $this->s4Service->dec2s4($incrId);
     }
 
     /**
      * @RequestMapping(path="/d",methods="get,post")
+     * @Middleware(CorsMiddleware::class)
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function d(RequestInterface $request, ResponseInterface $response)
     {
         $uri = $request->input('uri');
+        $ip  = $request->server('remote_addr', "");
         if (empty($uri)) {
-            throw new JsonException("uri err.", 10001);
+            throw new JsonException("源链接不能为空.", 10001);
         }
-        //TODO
-        if(preg_match('/[\x{4e00}-\x{9fff}]/iu',$uri)){
-            $uri = preg_replace_callback('/[\x{4e00}-\x{9fff}]/iu',function($d){
+        if (preg_match('/[\x{4e00}-\x{9fff}]/iu', $uri)) {
+            $uri = preg_replace_callback(
+                '/[\x{4e00}-\x{9fff}]/iu', function ($d) {
                 return urlencode($d[0]);
-            },$uri);
+            }, $uri);
         }
         //RFC 兼容 URL
         if (!filter_var($uri, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
-            throw new JsonException("uri err.", 10002);
+            throw new JsonException("链接格式错误.", 10002);
         }
-        $md5Key    = md5($uri);
-
-        $setRes    = $this->redis->sadd("dwz:_unique", $md5Key);
-        $uriLinks  = "dwz:_list";
+        list($setRes, $md5Key) = $this->DwzService->IsUniqueUrl($uri);
         if (!$setRes) {
             //已存在
-            $s4Id = $this->redis->hget("dwz:_unique_list", "{$md5Key}");
+            $s4Id = $this->DwzService->GetUrlUniqueListByKey($md5Key);
             if (!$s4Id) {
                 $s4Id = $this->getS4Id();
             }
@@ -100,26 +119,37 @@ class IndexController extends AbstractController
         else {
             $s4Id = $this->getS4Id();
         }
-        $this->redis->hset($uriLinks, "{$s4Id}", $uri);
-        $this->redis->hset("dwz:_unique_list", "{$md5Key}", "{$s4Id}");
-        $juri = env("DWZ_HOST","http://127.0.0.1:9501")."/z/{$s4Id}";
+        $this->DwzService->SetUrlListByS4id($s4Id, $uri);
+        $this->DwzService->SetUrlUniqueListByKey($md5Key, $s4Id);
+        $juri = $this->DwzService->GetZUrlFormatByS4Id($s4Id);
 
-        //TODO 统计
+        $jobData         = [];
+        $jobData['type'] = 1;
+        $jobData['ip']   = "{$ip}";
+        $jobData['uri']  = $uri;
+        $jobData['s4id'] = $s4Id;
+        $this->dwzJobService->push(json_encode($jobData));
 
-        return $response->json(['status' => 0, 'data' => ['d' => $s4Id, 'uri' => $uri, 'juri' => $juri], 'msg' => 'suc']);
+        return $response->json(['status' => 0, 'data' => ['d' => $s4Id, 'uri' => $uri, 'juri' => $juri], 'msg' => '链接转换成功.']);
 
     }
 
     public function z($did)
     {
-        $uriLinks  = "dwz:_list";
-        $juri  = $this->redis->hget($uriLinks, "{$did}");
-        if(!$juri){
-            throw new JsonErrException("短ID查询失败[{$did}]",10003);
+        $juri = $this->DwzService->GetUrlListByS4id($did);
+        $ip   = $this->request->server('remote_addr', "");
+        if (!$juri) {
+            throw new JsonErrException("短ID查询失败[{$did}]", 10003);
         }
-        //TODO 统计
+        $user_agent = $this->request->getHeader('user-agent')[0]??"";
 
-        return $this->response->redirect($juri,302);
+        $jobData               = [];
+        $jobData['type']       = 2;
+        $jobData['ip']         = "{$ip}";
+        $jobData['s4id']       = $did;
+        $jobData['user_agent'] = $user_agent;
+
+        $this->dwzJobService->push(json_encode($jobData));
+        return $this->response->redirect($juri, 302);
     }
-
 }

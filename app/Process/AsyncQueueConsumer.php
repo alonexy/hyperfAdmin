@@ -19,14 +19,14 @@ use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\AsyncQueue\Driver\DriverInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 /**
- * @Process
+ * @Process(name="async-queue")
  */
 class AsyncQueueConsumer extends ConsumerProcess
 {
     /**
      * @var string
      */
-    protected $queue = 'test_asyn_job';
+    protected $queue = 'dwz_asyn_job';
 
     /**
      * @var DriverInterface

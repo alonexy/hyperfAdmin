@@ -17,15 +17,18 @@ return [
         'timeout' => 2,
         'retry_seconds' => 5,
         'handle_timeout' => 10,
-        'processes' => 2,
+        'processes' => 1,
 
     ],
-    'test_asyn_job' => [
+    'dwz_asyn_job' => [
         'driver' => Hyperf\AsyncQueue\Driver\RedisDriver::class,
         'channel' => 'queue',
-        'timeout' => 2,
+        'timeout' => 20,
         'retry_seconds' => [1,3,5],
         'handle_timeout' => 5,
         'processes' => 5,
+        'concurrent' => [
+            'limit' => 5,
+        ],
     ],
 ];
