@@ -17,6 +17,7 @@ use App\Exception\JsonException;
 use App\Service\xFunc;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
+use Hyperf\Utils\Arr;
 use Hyperf\Utils\Coroutine;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -77,6 +78,7 @@ class IndexController extends AbstractController
         $access_num   = xFunc::convert($access_num);
         $ip_count     = xFunc::convert($ip_count);
         $ip_day_count = xFunc::convert($ip_day_count);
+
         return $view->render('web.index', compact('ip_count', 'ip_day_count', 'id_count', 'access_num'));
     }
 

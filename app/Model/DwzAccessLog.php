@@ -5,6 +5,12 @@ namespace App\Model;
 
 use Hyperf\DbConnection\Model\Model;
 /**
+ * @property int $id 
+ * @property string $s4id 
+ * @property int $ip 
+ * @property string $user_agent 
+ * @property \Carbon\Carbon $create_time 
+ * @property \Carbon\Carbon $update_time 
  */
 class DwzAccessLog extends Model
 {
@@ -19,18 +25,14 @@ class DwzAccessLog extends Model
      *
      * @var array
      */
-//    protected $fillable = [];
+    //    protected $fillable = [];
     protected $guarded = [];
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = [];
-
-    protected $connection = 'default';
-
+    protected $casts = ['id' => 'int', 'ip' => 'integer', 'create_time' => 'datetime', 'update_time' => 'datetime'];
     const CREATED_AT = 'create_time';
-
     const UPDATED_AT = 'update_time';
 }
