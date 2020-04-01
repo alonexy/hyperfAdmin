@@ -3,7 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>D721</title>
+    <title>D721|短链接服务</title>
+    <meta name="robots" content="all" />
+    <meta name="author" content="alonexy" />
+    <meta name="keywords" content="D721,短链接服务"/>
+    <meta name="description" content="D721,短链接服务"/>
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
@@ -23,7 +28,7 @@
                 <nav id="navbar" class="navbar" role="navigation" aria-label="main navigation">
                     <div class="navbar-brand">
                         <a class="navbar-item" href="/">
-                            <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+                            <img src="/logos/logo4.png" width="50%">
                         </a>
 
                         <a role="button" class="navbar-burger burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
@@ -36,31 +41,28 @@
                     <div id="navbarBasicExample" class="navbar-menu"  id="navMenu">
                         <div class="navbar-start">
                             <a class="navbar-item">
-                                Home
+                                首页
                             </a>
 
                             <a class="navbar-item">
-                                Documentation
+                                文档
                             </a>
 
                             <div class="navbar-item has-dropdown is-hoverable">
                                 <a class="navbar-link">
-                                    More
+                                    更多
                                 </a>
 
                                 <div class="navbar-dropdown">
                                     <a class="navbar-item">
-                                        About
+                                        关于我们
                                     </a>
                                     <a class="navbar-item">
-                                        Jobs
-                                    </a>
-                                    <a class="navbar-item">
-                                        Contact
+                                        联系我们
                                     </a>
                                     <hr class="navbar-divider">
                                     <a class="navbar-item">
-                                        Report an issue
+                                        常见问题
                                     </a>
                                 </div>
                             </div>
@@ -70,10 +72,10 @@
                             <div class="navbar-item">
                                 <div class="buttons">
                                     <a class="button is-primary">
-                                        <strong>Sign up</strong>
+                                        <strong>注册</strong>
                                     </a>
                                     <a class="button is-light">
-                                        Log in
+                                        登陆
                                     </a>
                                 </div>
                             </div>
@@ -120,7 +122,7 @@
                         <div class="field">
                             <div class="control level-left">
                                 <input name="uri" class="input is-primary is-rounded" type="text" autocomplete="off"
-                                       placeholder="输入源链接地址 (http://baidu.com)">
+                                       placeholder="支持输入https://或http://开头的链接">
                             </div>
                         </div>
                     </div>
