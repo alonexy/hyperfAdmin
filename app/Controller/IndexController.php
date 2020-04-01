@@ -71,15 +71,14 @@ class IndexController extends AbstractController
     {
         $id_count     = $this->DwzService->GetNowId();
         $access_num   = $this->DwzService->GetStatAccessNum();
+        $access_day_num   = $this->DwzService->GetStatAccessNum(date('Y-m-d'));
         $ip_count     = $this->DwzService->GetStatIp();
-        $ip_day_count = $this->DwzService->GetStatIp(date('Y-m-d'));
 
         $id_count     = xFunc::convert($id_count);
         $access_num   = xFunc::convert($access_num);
         $ip_count     = xFunc::convert($ip_count);
-        $ip_day_count = xFunc::convert($ip_day_count);
 
-        return $view->render('web.index', compact('ip_count', 'ip_day_count', 'id_count', 'access_num'));
+        return $view->render('web.index', compact('ip_count', 'access_day_num', 'id_count', 'access_num'));
     }
 
     private function getS4Id()

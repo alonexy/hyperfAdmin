@@ -112,7 +112,7 @@
                         <div>
                             <p class="heading">今日活跃</p>
 
-                            <p class="title">{{ $ip_day_count ?? '--' }}</p>
+                            <p class="title">{{ $access_day_num ?? '--' }}</p>
                         </div>
                     </div>
                 </nav>
