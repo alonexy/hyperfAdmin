@@ -63,12 +63,12 @@ class DwzService
 
     public function SetUrlListByS4id($s4Id, $uri)
     {
-        return $this->redis->hset(self::DWZ_URL_UNIQUE_SET_LIST_KEY, "{$s4Id}", "{$uri}");
+        return $this->redis->hset(self::DWZ_URL_LIST_KEY, "{$s4Id}", "{$uri}");
     }
 
     public function GetUrlListByS4id($s4Id)
     {
-        return $this->redis->hget(self::DWZ_URL_UNIQUE_SET_LIST_KEY, "{$s4Id}");
+        return $this->redis->hget(self::DWZ_URL_LIST_KEY, "{$s4Id}");
     }
 
     public function GetZUrlFormatByS4Id($s4Id)

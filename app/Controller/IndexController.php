@@ -86,7 +86,16 @@ class IndexController extends AbstractController
         $incrId = $this->DwzService->GetIncrId();
         return $this->s4Service->dec2s4($incrId);
     }
-
+    public function checkUrl($C_url)
+    {
+        $str = "/^http(s?):\/\/(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
+        if (!preg_match($str, $C_url)) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
     /**
      * @RequestMapping(path="/d",methods="get,post")
      * @Middleware(CorsMiddleware::class)
@@ -99,6 +108,7 @@ class IndexController extends AbstractController
         if (empty($uri)) {
             throw new JsonException("源链接不能为空.", 10001);
         }
+        //编码中文
         if (preg_match('/[\x{4e00}-\x{9fff}]/iu', $uri)) {
             $uri = preg_replace_callback(
                 '/[\x{4e00}-\x{9fff}]/iu', function ($d) {
@@ -153,4 +163,5 @@ class IndexController extends AbstractController
         $this->dwzJobService->push(json_encode($jobData));
         return $this->response->redirect($juri, 302);
     }
+
 }
