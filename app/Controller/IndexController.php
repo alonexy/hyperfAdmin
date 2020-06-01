@@ -14,43 +14,42 @@ namespace App\Controller;
 
 use App\Exception\JsonErrException;
 use App\Exception\JsonException;
+use App\Middleware\CorsMiddleware;
+use App\Service\BinaryExtService;
+use App\Service\DwzQueueService;
+use App\Service\DwzService;
 use App\Service\xFunc;
 use Hyperf\Di\Annotation\Inject;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Coroutine;
-use Hyperf\Redis\RedisFactory;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use App\Service\BinaryExtService;
-use App\Middleware\CorsMiddleware;
+use Hyperf\Redis\RedisFactory;
+use Hyperf\Utils\ApplicationContext;
 use Hyperf\View\RenderInterface;
-use App\Service\DwzQueueService;
-use App\Service\DwzService;
 
 /**
- * @Controller(prefix="/",server="http")
- * @package App\Controller
+ * @Controller(prefix="/", server="http")
  */
 class IndexController extends AbstractController
 {
     use xFunc;
+
     /**
-     * @Inject()
+     * @Inject
      * @var BinaryExtService
      */
     public $s4Service;
+
     /**
-     * @Inject()
+     * @Inject
      * @var DwzQueueService
      */
     protected $dwzJobService;
 
     /**
-     * @Inject()
+     * @Inject
      * @var DwzService
      */
     protected $DwzService;
@@ -64,60 +63,58 @@ class IndexController extends AbstractController
     }
 
     /**
-     * @RequestMapping(path="/",methods="get,post")
+     * @RequestMapping(path="/", methods="get,post")
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function index(RequestInterface $request, RenderInterface $view)
     {
-        $id_count     = $this->DwzService->GetNowId();
-        $access_num   = $this->DwzService->GetStatAccessNum();
-        $access_day_num   = $this->DwzService->GetStatAccessNum(date('Y-m-d'));
-        $ip_count     = $this->DwzService->GetStatIp();
+        $id_count       = $this->DwzService->GetNowId();
+        $access_num     = $this->DwzService->GetStatAccessNum();
+        $access_day_num = $this->DwzService->GetStatAccessNum(date('Y-m-d'));
+        $ip_count       = $this->DwzService->GetStatIp();
 
-        $id_count     = xFunc::convert($id_count);
-        $access_num   = xFunc::convert($access_num);
-        $ip_count     = xFunc::convert($ip_count);
+        $id_count   = xFunc::convert($id_count);
+        $access_num = xFunc::convert($access_num);
+        $ip_count   = xFunc::convert($ip_count);
 
         return $view->render('web.index', compact('ip_count', 'access_day_num', 'id_count', 'access_num'));
     }
 
-    private function getS4Id()
-    {
-        $incrId = $this->DwzService->GetIncrId();
-        return $this->s4Service->dec2s4($incrId);
-    }
     public function checkUrl($C_url)
     {
-        $str = "/^http(s?):\/\/(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
+        $str = "/^http(s?):\\/\\/(?:[A-za-z0-9-]+\\.)+[A-za-z]{2,4}(?:[\\/\\?#][\\/=\\?%\\-&~`@[\\]\\':+!\\.#\\w]*)?$/";
         if (!preg_match($str, $C_url)) {
             return false;
         }
-        else {
-            return true;
-        }
+
+        return true;
     }
+
     /**
-     * @RequestMapping(path="/d",methods="get,post")
+     * @RequestMapping(path="/d", methods="get,post")
      * @Middleware(CorsMiddleware::class)
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function d(RequestInterface $request, ResponseInterface $response)
     {
         $uri = $request->input('uri');
-        $ip  = $request->server('remote_addr', "");
+        $ip  = $request->server('remote_addr', '');
         if (empty($uri)) {
-            throw new JsonException("源链接不能为空.", 10001);
+            throw new JsonException('源链接不能为空.', 10001);
         }
         //编码中文
         if (preg_match('/[\x{4e00}-\x{9fff}]/iu', $uri)) {
             $uri = preg_replace_callback(
-                '/[\x{4e00}-\x{9fff}]/iu', function ($d) {
-                return urlencode($d[0]);
-            }, $uri);
+                '/[\x{4e00}-\x{9fff}]/iu',
+                function ($d) {
+                    return urlencode($d[0]);
+                },
+                $uri
+            );
         }
         //RFC 兼容 URL
         if (!filter_var($uri, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
-            throw new JsonException("链接格式错误.", 10002);
+            throw new JsonException('链接格式错误.', 10002);
         }
         list($setRes, $md5Key) = $this->DwzService->IsUniqueUrl($uri);
         if (!$setRes) {
@@ -142,17 +139,16 @@ class IndexController extends AbstractController
         $this->dwzJobService->push(json_encode($jobData));
 
         return $response->json(['status' => 0, 'data' => ['d' => $s4Id, 'uri' => $uri, 'juri' => $juri], 'msg' => '链接转换成功.']);
-
     }
 
     public function z($did)
     {
         $juri = $this->DwzService->GetUrlListByS4id($did);
-        $ip   = $this->request->server('remote_addr', "");
+        $ip   = $this->request->server('remote_addr', '');
         if (!$juri) {
             throw new JsonErrException("短ID查询失败[{$did}]", 10003);
         }
-        $user_agent = $this->request->getHeader('user-agent')[0]??"";
+        $user_agent = $this->request->getHeader('user-agent')[0] ?? '';
 
         $jobData               = [];
         $jobData['type']       = 2;
@@ -164,4 +160,9 @@ class IndexController extends AbstractController
         return $this->response->redirect($juri, 302);
     }
 
+    private function getS4Id()
+    {
+        $incrId = $this->DwzService->GetIncrId();
+        return $this->s4Service->dec2s4($incrId);
+    }
 }

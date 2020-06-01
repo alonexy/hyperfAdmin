@@ -12,12 +12,13 @@ declare(strict_types=1);
 
 namespace App\Process;
 
-use Hyperf\AsyncQueue\Process\ConsumerProcess;
-use Hyperf\Process\Annotation\Process;
-use Psr\Container\ContainerInterface;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\AsyncQueue\Driver\DriverInterface;
+use Hyperf\AsyncQueue\Process\ConsumerProcess;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Process\Annotation\Process;
+use Psr\Container\ContainerInterface;
+
 /**
  * @Process(name="async-queue")
  */
@@ -32,6 +33,7 @@ class AsyncQueueConsumer extends ConsumerProcess
      * @var DriverInterface
      */
     protected $driver;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);

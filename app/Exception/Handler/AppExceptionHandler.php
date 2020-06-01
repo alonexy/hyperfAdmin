@@ -34,7 +34,7 @@ class AppExceptionHandler extends ExceptionHandler
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
         //json 为默认报错输出 不记录日志
-        if(!$throwable instanceof JsonException){
+        if (! $throwable instanceof JsonException) {
             $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
         }
         return $response->withStatus(500)->withBody(new SwooleStream('Internal Server Error.'));

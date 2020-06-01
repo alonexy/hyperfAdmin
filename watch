@@ -22,8 +22,9 @@ const WATCH_EXT = 'php,env';
 const EXCLUDE_DIR = ['vendor', 'runtime', 'public'];
 # Entry Point File 入口文件
 const ENTRY_POINT_FILE = __DIR__ . '/bin/hyperf.php';
+const PHP_INI_SETS = '-d swoole.use_shortname=off';
 # Start Command 启动命令
-const START_COMMAND = [ENTRY_POINT_FILE, 'start'];
+const START_COMMAND = [PHP_INI_SETS,ENTRY_POINT_FILE, 'start'];
 # PID File Path PID文件路径
 const PID_FILE_PATH = __DIR__ . '/runtime/hyperf.pid';
 # Scan Interval 扫描间隔（毫秒，默认2000）

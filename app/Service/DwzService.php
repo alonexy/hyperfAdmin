@@ -1,9 +1,13 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: alonexy
- * Date: 20/3/27
- * Time: 22:41
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://doc.hyperf.io
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf-cloud/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service;
@@ -13,22 +17,27 @@ use Hyperf\Utils\ApplicationContext;
 
 class DwzService
 {
+    const DWZ_INCR_ID_KEY = 'dwz:_id';
+
+    const DWZ_URL_LIST_KEY = 'dwz:_list';
+
+    const DWZ_URL_UNIQUE_SET_KEY = 'dwz:_unique';
+
+    const DWZ_URL_UNIQUE_SET_LIST_KEY = 'dwz:_unique_list';
+
+    const DWZ_ACCESS_NUM_STAT_KEY = 'dwz:stat:_access_num';
+
+    const DWZ_ACCESS_NUM_DAY_STAT_KEY = 'dwz:stat:_access_day_num:';
+
+    const DWZ_ACCESS_NUM_IP_STAT_KEY = 'dwz:stat:_ip_num';
+
+    const DWZ_ACCESS_NUM_IP_DAY_STAT_KEY = 'dwz:stat:_ip_day_num:';
+
     protected $redis;
-
-    const DWZ_INCR_ID_KEY = "dwz:_id";
-    const DWZ_URL_LIST_KEY = "dwz:_list";
-
-    const DWZ_URL_UNIQUE_SET_KEY = "dwz:_unique";
-    const DWZ_URL_UNIQUE_SET_LIST_KEY = "dwz:_unique_list";
-
-    const DWZ_ACCESS_NUM_STAT_KEY = "dwz:stat:_access_num";
-    const DWZ_ACCESS_NUM_DAY_STAT_KEY = "dwz:stat:_access_day_num:";
-    const DWZ_ACCESS_NUM_IP_STAT_KEY = "dwz:stat:_ip_num";
-    const DWZ_ACCESS_NUM_IP_DAY_STAT_KEY = "dwz:stat:_ip_day_num:";
 
     public function __construct()
     {
-        $container   = ApplicationContext::getContainer();
+        $container = ApplicationContext::getContainer();
         $this->redis = $container->get(RedisFactory::class)->get('default');
     }
 
@@ -43,10 +52,10 @@ class DwzService
     }
 
     //设置url是否已存在并获取唯一key
-    public function IsUniqueUrl($uri) : array
+    public function IsUniqueUrl($uri): array
     {
         $md5Key = md5($uri);
-        $res    = $this->redis->sadd(self::DWZ_URL_UNIQUE_SET_KEY, $md5Key);
+        $res = $this->redis->sadd(self::DWZ_URL_UNIQUE_SET_KEY, $md5Key);
         return [$res, $md5Key];
     }
 
@@ -73,35 +82,35 @@ class DwzService
 
     public function GetZUrlFormatByS4Id($s4Id)
     {
-        return env("DWZ_HOST", "http://127.0.0.1:9501") . "/z/{$s4Id}";
+        return env('DWZ_HOST', 'http://127.0.0.1:9501') . "/z/{$s4Id}";
     }
 
     public function StatAccessNumIncr()
     {
-        $randNum = max(rand(0, 30),1);
-        $this->redis->incr(self::DWZ_ACCESS_NUM_DAY_STAT_KEY . date("Y-m-d"), $randNum);
+        $randNum = max(rand(0, 30), 1);
+        $this->redis->incr(self::DWZ_ACCESS_NUM_DAY_STAT_KEY . date('Y-m-d'), $randNum);
         return $this->redis->incr(self::DWZ_ACCESS_NUM_STAT_KEY, $randNum);
     }
 
     public function GetStatAccessNum($day = null)
     {
-        if (!empty($day)) {
-            return $this->redis->get(self::DWZ_ACCESS_NUM_DAY_STAT_KEY . date("Y-m-d"));
+        if (! empty($day)) {
+            return $this->redis->get(self::DWZ_ACCESS_NUM_DAY_STAT_KEY . date('Y-m-d'))?:0;
         }
-        return $this->redis->get(self::DWZ_ACCESS_NUM_STAT_KEY);
+        return $this->redis->get(self::DWZ_ACCESS_NUM_STAT_KEY)?:0;
     }
 
     //统计ip
     public function SataSetIp($ip)
     {
-        $this->redis->setbit(self::DWZ_ACCESS_NUM_IP_DAY_STAT_KEY . date("Y-m-d"), $ip, true);
-        return !$this->redis->setbit(self::DWZ_ACCESS_NUM_IP_STAT_KEY, $ip, true);
+        $this->redis->setbit(self::DWZ_ACCESS_NUM_IP_DAY_STAT_KEY . date('Y-m-d'), $ip, true);
+        return ! $this->redis->setbit(self::DWZ_ACCESS_NUM_IP_STAT_KEY, $ip, true);
     }
 
     public function GetStatIp($day = null)
     {
-        if (!empty($day)) {
-            return $this->redis->bitcount(self::DWZ_ACCESS_NUM_IP_DAY_STAT_KEY . date("Y-m-d"));
+        if (! empty($day)) {
+            return $this->redis->bitcount(self::DWZ_ACCESS_NUM_IP_DAY_STAT_KEY . date('Y-m-d'));
         }
         return $this->redis->bitcount(self::DWZ_ACCESS_NUM_IP_STAT_KEY) + 6000;
     }

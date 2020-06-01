@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace App\Exception\Handler;
 
-use App\Exception\JsonException;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
@@ -41,21 +40,22 @@ class JsonExceptionHandler extends ExceptionHandler
             $errMsg = $throwable->validator->errors()->first();
             // 格式化输出
             $data = json_encode([
-                                    'status' => $throwable->getCode(),
-                                    'msg' => $errMsg,
-                                ], JSON_UNESCAPED_UNICODE);
+                'status' => $throwable->getCode(),
+                'msg' => $errMsg,
+            ], JSON_UNESCAPED_UNICODE);
             // 阻止异常冒泡
             $this->stopPropagation();
-            return $response->withStatus(200)->withHeader("Content-Type","application/json")->withBody(new SwooleStream($data));
-        }else if($throwable instanceof ServerException){
+            return $response->withStatus(200)->withHeader('Content-Type', 'application/json')->withBody(new SwooleStream($data));
+        }
+        if ($throwable instanceof ServerException) {
             // 格式化输出
             $data = json_encode([
-                                    'status' => $throwable->getCode(),
-                                    'msg' => $throwable->getMessage(),
-                                ], JSON_UNESCAPED_UNICODE);
+                'status' => $throwable->getCode(),
+                'msg' => $throwable->getMessage(),
+            ], JSON_UNESCAPED_UNICODE);
             // 阻止异常冒泡
             $this->stopPropagation();
-            return $response->withStatus(200)->withHeader("Content-Type","application/json")->withBody(new SwooleStream($data));
+            return $response->withStatus(200)->withHeader('Content-Type', 'application/json')->withBody(new SwooleStream($data));
         }
         return $response;
     }

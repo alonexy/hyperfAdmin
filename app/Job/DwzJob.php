@@ -1,15 +1,22 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://doc.hyperf.io
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf-cloud/hyperf/blob/master/LICENSE
+ */
 
 namespace App\Job;
 
-use Hyperf\AsyncQueue\Job;
-use App\Model\DwzLog;
 use App\Model\DwzAccessLog;
-use Hyperf\DbConnection\Db;
+use App\Model\DwzLog;
 use App\Service\DwzService;
-use Hyperf\Di\Annotation\Inject;
+use Hyperf\AsyncQueue\Job;
+use Hyperf\DbConnection\Db;
 
 class DwzJob extends Job
 {
@@ -18,7 +25,6 @@ class DwzJob extends Job
     public function __construct($params)
     {
         $this->params = $params;
-
     }
 
     public function handle()
@@ -32,31 +38,28 @@ class DwzJob extends Job
             if ($data['type'] == 1) {
                 unset($data['type']);
                 $data['uk'] = md5($data['uri']);
-                $ip         = $data['ip'];
-                $res        = Db::select("SELECT inet_aton('{$ip}') as ip limit 1;");
-                $arr        = collect($res[0])->toArray();
+                $ip = $data['ip'];
+                $res = Db::select("SELECT inet_aton('{$ip}') as ip limit 1;");
+                $arr = collect($res[0])->toArray();
                 if (isset($arr['ip'])) {
                     $DwzService->SataSetIp($arr['ip']);
                     $data['ip'] = $arr['ip'];
-                    /** @var DwzLog $dwzlog */
+                    /* @var DwzLog $dwzlog */
                     Dwzlog::create($data);
                 }
-            }
-            else {
+            } else {
                 unset($data['type']);
-                $ip         = $data['ip'];
-                $res        = Db::select("SELECT inet_aton('{$ip}') as ip limit 1;");
-                $arr        = collect($res[0])->toArray();
+                $ip = $data['ip'];
+                $res = Db::select("SELECT inet_aton('{$ip}') as ip limit 1;");
+                $arr = collect($res[0])->toArray();
                 if (isset($arr['ip'])) {
                     $DwzService->SataSetIp($arr['ip']);
                     $data['ip'] = $arr['ip'];
-                    /** @var DwzAccessLog $dwzAccesssLog */
+                    /* @var DwzAccessLog $dwzAccesssLog */
                     DwzAccessLog::create($data);
                 }
             }
-
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             print_r($e->getMessage());
         }
     }
