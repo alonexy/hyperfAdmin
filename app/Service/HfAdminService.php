@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 /**
  * This file is part of Hyperf.
  *
@@ -65,9 +65,11 @@ class HfAdminService
             $ret = $this->UserModel->where('email', $email)
                 ->where('password', $this->passSign($passwd))
                 ->firstOrFail();
-        } catch (ModelNotFoundException $e) {
+        }
+        catch (ModelNotFoundException $e) {
             return [false, 'login Fail', null];
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return [false, $e->getMessage(), null];
         }
         return [true, '', $ret->toArray()];
@@ -89,12 +91,12 @@ class HfAdminService
     {
         $arr = $request->getAttributes();
         $ret = array_values($arr);
-        if (empty($request) || ! isset($ret[0])) {
+        if (empty($request) || !isset($ret[0])) {
             return [false, null];
         }
         $action = $ret[0]->handler->callback[0];
-        $func = $ret[0]->handler->callback[1];
-        $route = $ret[0]->handler->route;
+        $func   = $ret[0]->handler->callback[1];
+        $route  = $ret[0]->handler->route;
         return [true, "{$action}@{$func}", $route];
     }
 
@@ -105,62 +107,63 @@ class HfAdminService
     public function getMenus()
     {
         $ClassArr = AnnotationCollector::getClassByAnnotation(HfAdminC::class);
-        $FuncArr = AnnotationCollector::getMethodByAnnotation(HfAdminF::class);
-        $Menus = [];
-        $reader = new AnnotationReader();
+        $FuncArr  = AnnotationCollector::getMethodByAnnotation(HfAdminF::class);
+        $Menus    = [];
+        $reader   = new AnnotationReader();
         foreach ($ClassArr as $k => $c) {
-            $C['Class'] = $k;
-            $C['Cpath'] = '';
-            $C['Cdisplay'] = false; //默认隐藏
-            $C['active'] = false; //默认不选中
-            $reflClass = new \ReflectionClass(new $k());
-            $Rname = $reflClass->getName();
-            $pathArr = explode('\\', $Rname);
-            $slicePathArr = array_slice($pathArr, 2);
+            $C['Class']                             = $k;
+            $C['Cpath']                             = '';
+            $C['Cdisplay']                          = false; //默认隐藏
+            $C['active']                            = false; //默认不选中
+            $reflClass                              = new \ReflectionClass(new $k());
+            $Rname                                  = $reflClass->getName();
+            $pathArr                                = explode('\\', $Rname);
+            $slicePathArr                           = array_slice($pathArr, 2);
             $slicePathArr[count($slicePathArr) - 1] = preg_replace('/controller/', '', strtolower(end($slicePathArr)));
-            $C['Cpath'] = strtolower(implode('/', $slicePathArr));
-            $classAnnotations = $reader->getClassAnnotations($reflClass);
-            $C['Cauto'] = false;
+            $C['Cpath']                             = strtolower(implode('/', $slicePathArr));
+            $classAnnotations                       = $reader->getClassAnnotations($reflClass);
+            $C['Cauto']                             = false;
             foreach ($classAnnotations as $cAnnot) {
                 if ($cAnnot instanceof AutoController) {
-                    if (! empty($cAnnot->prefix)) {
+                    if (!empty($cAnnot->prefix)) {
                         $C['Cpath'] = $cAnnot->prefix;
                     }
                     $C['Cauto'] = true;
-                } elseif ($cAnnot instanceof Controller) {
-                    if (! empty($cAnnot->prefix)) {
+                }
+                elseif ($cAnnot instanceof Controller) {
+                    if (!empty($cAnnot->prefix)) {
                         $C['Cpath'] = $cAnnot->prefix;
                     }
                 }
             }
-            if (! preg_match('/^\\/.*/', $C['Cpath'])) {
+            if (!preg_match('/^\\/.*/', $C['Cpath'])) {
                 $C['Cpath'] = '/' . $C['Cpath'];
             }
-            $C['Cname'] = $c->Cname;
-            $C['Csort'] = $c->Csort;
-            $C['Cstyle'] = $c->Cstyle;
-            $Menus[md5($k)]['C'] = $C;
+            $C['Cname']             = $c->Cname;
+            $C['Csort']             = $c->Csort;
+            $C['Cstyle']            = $c->Cstyle;
+            $Menus[md5($k)]['C']    = $C;
             $Menus[md5($k)]['sort'] = $c->Csort;
         }
         foreach ($FuncArr as $k => $f) {
-            $farr = [];
-            $c = $f['class'];
-            $method = $f['method'];
-            $farr['fun_path'] = $f['method']; //默认使用方法名
-            $farr['route'] = $f['method'];
-            $refectMethod = new \ReflectionMethod(new $c(), $method);
+            $farr              = [];
+            $c                 = $f['class'];
+            $method            = $f['method'];
+            $farr['fun_path']  = $f['method']; //默认使用方法名
+            $farr['route']     = $f['method'];
+            $refectMethod      = new \ReflectionMethod(new $c(), $method);
             $methodAnnotations = $reader->getMethodAnnotations($refectMethod);
             foreach ($methodAnnotations as $mAnnot) {
                 if ($mAnnot instanceof Mapping) {
-                    if (! empty($mAnnot->path)) {
+                    if (!empty($mAnnot->path)) {
                         $farr['fun_path'] = $mAnnot->path;
                     }
                 }
             }
-            $farr['active'] = false;
+            $farr['active']  = false;
             $farr['display'] = $f['annotation']->Fdisplay;
-            $farr['name'] = $f['annotation']->Fname;
-            $farr['style'] = $f['annotation']->Fstyle;
+            $farr['name']    = $f['annotation']->Fname;
+            $farr['style']   = $f['annotation']->Fstyle;
             /*
              * C  不存在默认忽略
              */
@@ -168,11 +171,13 @@ class HfAdminService
                 //自动方法使用方法名为路由
                 if ($Menus[md5($f['class'])]['C']['Cauto'] === true) {
                     $farr['route'] = $Menus[md5($f['class'])]['C']['Cpath'] . '/' . $farr['route'];
-                } else {
+                }
+                else {
                     //如果方法里面有／说明路由是根地址
                     if (preg_match('/^\\/.*/', $farr['fun_path'])) {
                         $farr['route'] = $farr['fun_path'];
-                    } else {
+                    }
+                    else {
                         $farr['route'] = $Menus[md5($f['class'])]['C']['Cpath'] . '/' . $farr['fun_path'];
                     }
                 }
@@ -192,7 +197,7 @@ class HfAdminService
      */
     public function arrays_sort_by_item($arr, $direction = 'SORT_DESC', $field = 'id')
     {
-        $sort = [
+        $sort    = [
             'direction' => $direction, //排序顺序标志 SORT_DESC 降序；SORT_ASC 升序
             'field' => $field,       //排序字段
         ];
@@ -216,10 +221,10 @@ class HfAdminService
     public function getAuthRole()
     {
         list($res, $user) = $this->getAuthUser();
-        if (! $res) {
+        if (!$res) {
             return ['--', 0, []];
         }
-        $rid = (int) $user['rid'];
+        $rid = (int)$user['rid'];
         if ($rid === 0) {
             return ['超级管理员', 1, []];
         }
@@ -228,7 +233,7 @@ class HfAdminService
             throw new \Exception('Role is ERr');
         }
         $powers = [];
-        if (! empty($info->powers)) {
+        if (!empty($info->powers)) {
             $powers = explode(',', $info->powers);
         }
         return [$info->name, 2, $powers];
@@ -247,7 +252,8 @@ class HfAdminService
                 throw new \Exception('Auth is ERr');
             }
             return [true, $user];
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return [false, null];
         }
     }
@@ -277,10 +283,10 @@ class HfAdminService
         //$RoleType 0 无 1 superAdmin 2 admin
         list($RoleName, $RoleType, $Powers) = $this->getAuthRole(); //获取角色
         list($res, $action, $route) = $this->getCurrentActionAndRoute($request);
-        if (! $res) {
+        if (!$res) {
             throw new \Exception('1023 Err.');
         }
-        if (! in_array($action, $Powers) && $RoleType !== 1) {
+        if (!in_array($action, $Powers) && $RoleType !== 1) {
             throw new \Exception('没有权限.');
         }
         list($c, $f) = explode('@', $action);
@@ -292,8 +298,11 @@ class HfAdminService
                 if ($RoleType !== 1) {
                     //存在权限
                     if (in_array($menu['C']['Class'] . '@' . $mF['fun_path'], $Powers)) {
-                        $mF['display'] = true;
-                    } else {
+                        if ($mF['display']) {
+                            $mF['display'] = true;
+                        }
+                    }
+                    else {
                         $mF['display'] = false;
                     }
                 }
