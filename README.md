@@ -31,6 +31,6 @@ class UserController extends AbstractController{...}
 ![role_list](./public/static/role_list.png)
 ![edit_role](./public/static/edit_role.png)
 
-# demo
+# Demo
 -  内含短网址DEMO
 http://d.alonexy.com/
