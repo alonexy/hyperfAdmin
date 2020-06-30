@@ -48,7 +48,7 @@ class RoleController extends AbstractController
 
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="角色列表", Fstyle="fa-circle-o", Fdisplay=true)
+     * @HfAdminF(Fname="角色列表", Fdisplay=true,Fstyle="shield-key")
      * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -62,7 +62,7 @@ class RoleController extends AbstractController
 
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="创建角色", Fstyle="fa-circle-o", Fdisplay=true)
+     * @HfAdminF(Fname="创建角色", Fstyle="fa-circle-o", Fdisplay=true,Fstyle="shield-plus")
      */
     public function create(RequestInterface $request, RenderInterface $view, ResponseInterface $response)
     {

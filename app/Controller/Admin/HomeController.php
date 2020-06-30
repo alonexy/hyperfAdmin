@@ -24,8 +24,8 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\View\RenderInterface;
 
 /**
- * @AutoController(prefix="/admin", server="http")
- * @HfAdminC(Cname="控制面板", Cstyle="fa-dashboard", Csort=1)
+ * @AutoController(prefix="/admin/home", server="http")
+ * @HfAdminC(Cname="控制面板", Cstyle="account", Csort=1)
  * @Middleware(HfAdminMiddleWare::class)
  * Class HomeController
  */
@@ -33,7 +33,7 @@ class HomeController extends AbstractController
 {
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="首页", Fdisplay=true)
+     * @HfAdminF(Fname="首页", Fdisplay=true,Fstyle="home")
      * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -45,7 +45,7 @@ class HomeController extends AbstractController
 
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="代办列表", Fdisplay=true)
+     * @HfAdminF(Fname="代办列表", Fdisplay=0,Fstyle="plus-box-multiple")
      * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */

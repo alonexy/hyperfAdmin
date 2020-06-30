@@ -49,7 +49,7 @@ class UserController extends AbstractController
     protected $validationFactory;
 
     /**
-     * @HfAdminF(Fname="账号列表", Fdisplay=true, Fstyle="fa-circle-o")
+     * @HfAdminF(Fname="账号列表", Fdisplay=true, Fstyle="account-heart")
      * @param RenderInterface $response
      * @return mixed
      */
@@ -75,7 +75,7 @@ class UserController extends AbstractController
 
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="新增账号", Fdisplay=true, Fstyle="fa-circle-o")
+     * @HfAdminF(Fname="新增账号", Fdisplay=true, Fstyle="account-edit")
      */
     public function create(RequestInterface $request, RenderInterface $view, ResponseInterface $response)
     {

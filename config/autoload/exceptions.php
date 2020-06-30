@@ -16,6 +16,7 @@ return [
             App\Exception\Handler\AppExceptionHandler::class,
             App\Exception\Handler\JsonExceptionHandler::class, //不记录log
             App\Exception\Handler\JsonErrExceptionHandler::class, //记录log
+            App\Exception\Handler\AuthExceptionHandler::class, //Api Auth
         ],
     ],
 ];

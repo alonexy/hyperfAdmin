@@ -33,7 +33,7 @@ class AccountController extends AbstractController
 {
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="用户列表", Fdisplay=true)
+     * @HfAdminF(Fname="用户列表", Fdisplay=true,Fstyle="account-group")
      * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -44,7 +44,7 @@ class AccountController extends AbstractController
 
     /**
      * @RequestMapping(methods="get,post")
-     * @HfAdminF(Fname="添加用户", Fdisplay=true)
+     * @HfAdminF(Fname="添加用户", Fdisplay=true,Fstyle="account-plus")
      * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */

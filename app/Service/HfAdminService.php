@@ -25,6 +25,7 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Mapping;
 use Hyperf\View\RenderInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Qbhy\HyperfAuth\AuthManager;
 
 class HfAdminService
 {
@@ -41,16 +42,10 @@ class HfAdminService
     public $RoleModel;
 
     /**
-     * @Inject
-     * @var RenderInterface
+     * @Inject()
+     * @var AuthManager
      */
-    public $view;
-
-    /**
-     * @Inject
-     * @var \Hyperf\Contract\SessionInterface
-     */
-    private $session;
+    protected $auth;
 
     /**
      * 验证用户.
@@ -67,12 +62,12 @@ class HfAdminService
                 ->firstOrFail();
         }
         catch (ModelNotFoundException $e) {
-            return [false, 'login Fail', null];
+            return [false, 'User Login  Fail', null];
         }
         catch (\Exception $e) {
             return [false, $e->getMessage(), null];
         }
-        return [true, '', $ret->toArray()];
+        return [true, '', $ret];
     }
 
     public function passSign($passwd, $signSalt = null)
@@ -121,6 +116,7 @@ class HfAdminService
             $slicePathArr                           = array_slice($pathArr, 2);
             $slicePathArr[count($slicePathArr) - 1] = preg_replace('/controller/', '', strtolower(end($slicePathArr)));
             $C['Cpath']                             = strtolower(implode('/', $slicePathArr));
+            $C['class_name']                        = ucfirst(last($slicePathArr));
             $classAnnotations                       = $reader->getClassAnnotations($reflClass);
             $C['Cauto']                             = false;
             foreach ($classAnnotations as $cAnnot) {
@@ -247,7 +243,7 @@ class HfAdminService
     public function getAuthUser()
     {
         try {
-            $user = $this->session->get('user.info');
+            $user = $this->auth->user();
             if (empty($user)) {
                 throw new \Exception('Auth is ERr');
             }
@@ -323,18 +319,7 @@ class HfAdminService
      */
     public function isLoign()
     {
-        return $this->session->has('user');
+        return $this->auth->check();
     }
 
-    /**
-     * 错误页面渲染.
-     * @param $code
-     * @param $errMsg
-     * @param null|mixed $jump
-     * @return mixed
-     */
-    public function errorView($code, $errMsg, $jump = null)
-    {
-        return $this->view->render("errors.{$code}", compact('errMsg', 'jump'));
-    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 /**
  * This file is part of Hyperf.
  *
@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Hyperf\DbConnection\Model\Model;
+use Qbhy\HyperfAuth\AuthAbility;
+use Qbhy\HyperfAuth\Authenticatable;
 
 /**
  * @property int $id
@@ -25,8 +27,9 @@ use Hyperf\DbConnection\Model\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
-class User extends Model
+class User extends Model implements Authenticatable
 {
+    use AuthAbility;
     /**
      * The table associated with the model.
      *
@@ -47,4 +50,7 @@ class User extends Model
      * @var array
      */
     protected $casts = ['id' => 'int', 'rid' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+
+
 }

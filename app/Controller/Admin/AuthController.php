@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 /**
  * This file is part of Hyperf.
  *
@@ -14,20 +14,32 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Service\HfAdminService;
+use Hyperf\Cache\Helper\Func;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\AutoController;
+use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\PostMapping;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\View\RenderInterface;
+use Qbhy\HyperfAuth\AuthManager;
 
 /**
- * @AutoController(prefix="/auth")
+ * @Controller(prefix="/auth")
  * Class AuthController
  */
 class AuthController extends AbstractController
 {
+    use Func;
+
+    /**
+     * @Inject()
+     * @var AuthManager
+     */
+    protected $auth;
     /**
      * @Inject
      * @var HfAdminService
@@ -41,63 +53,51 @@ class AuthController extends AbstractController
     protected $validationFactory;
 
     /**
-     * @Inject
-     * @var \Hyperf\Contract\SessionInterface
-     */
-    private $session;
-
-    /**
-     * @RequestMapping(methods="get,post")
+     * @PostMapping(path="login")
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function login(RequestInterface $request, RenderInterface $view, ResponseInterface $response)
+    public function login(RequestInterface $request, ResponseInterface $response)
     {
-        $errors = null;
-        if ($this->HfAdminService->isLoign()) {
-            return $response->redirect('/admin/index', 302);
+
+        $validator = $this->validationFactory->make(
+            $request->all(),
+            [
+                'email' => 'required|email|bail',
+                'passwd' => 'required|min:6',
+                'remember_token' => 'string|min:11',
+            ]
+        );
+        if ($validator->fails()) {
+            // Handle exception
+            $errors = $validator->errors();
+            return $response->json($this->getMessageBody($validator->errors()->first(), ["errors" => $errors]));
         }
-        if ($request->getMethod() == 'POST') {
-            $validator = $this->validationFactory->make(
-                $request->all(),
-                [
-                    'email' => 'required|email|bail',
-                    'passwd' => 'required|min:6',
-                    'remember_token' => 'string|min:11',
-                ]
-            );
-            if ($validator->fails()) {
-                // Handle exception
-                $errors = $validator->errors();
-            } else {
-                $email = $request->post('email');
-                $passwd = $request->post('passwd');
-                $remember_token = $request->post('remember_token', null);
-                list($res, $errMsg, $info) = $this->HfAdminService->auth($email, $passwd, $remember_token);
-                if (! $res) {
-                    $validator->errors()->add('err', $errMsg);
-                    $errors = $validator->errors();
-                }
-                if ($info['status'] !== 1) {
-                    $validator->errors()->add('err', '用户状态异常');
-                    $errors = $validator->errors();
-                } else {
-                    $this->session->set('user.info', $info);
-                    return $response->redirect('/admin/index', 302);
-                }
+        else {
+            $email          = $request->post('email');
+            $passwd         = $request->post('passwd');
+            $remember_token = $request->post('remember_token', null);
+            list($res, $errMsg, $info) = $this->HfAdminService->auth($email, $passwd, $remember_token);
+            if (!$res) {
+                return $response->json($this->getMessageBody($errMsg, [], -1));
+            }
+            if ($info->status !== 1) {
+                return $response->json($this->getMessageBody($errMsg, [], -1));
+            }
+            else {
+                $token = $this->auth->login($info);
+                return $response->json($this->getMessageBody("SUC", ["token" => $token]));
             }
         }
-        return $view->render('auth.login', compact('errors'));
+
     }
 
     /**
-     * @RequestMapping(methods="get")
+     * @GetMapping(path="logout")
      * @return mixed
      */
-    public function logout(RequestInterface $request, RenderInterface $view)
+    public function logout(RequestInterface $request, ResponseInterface $response)
     {
-        $errors = null;
-        $status = 0;
-        $this->session->clear();
-        return $view->render('auth.login', compact('errors', 'status'));
+        $this->auth->logout();
+        return $response->json($this->getMessageBody("logOut Suc."));
     }
 }

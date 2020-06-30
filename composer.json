@@ -49,7 +49,8 @@
         "hyperf/json-rpc": "^1.1",
         "hyperf/rpc-server": "^1.1",
         "hyperf/service-governance": "^1.1",
-        "hyperf/rate-limit": "^1.1"
+        "hyperf/rate-limit": "^1.1",
+        "96qbhy/hyperf-auth":"^1.0"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",
@@ -71,7 +72,9 @@
         "psr-4": {
             "App\\": "app/"
         },
-        "files": []
+        "files": [
+            "app/functions/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
